@@ -254,7 +254,7 @@ const App = () => {
         <Header isEditor={false} />
         <div className="absolute top-0 -z-10 w-full h-full bg-gradient-to-b from-blue-900/10 via-transparent to-transparent" />
         <h1 className="text-7xl md:text-9xl font-black tracking-tighter mb-8 leading-normal pt-48 pb-6 italic uppercase">DUMP <br /> Split</h1>
-        <p className="text-gray-400 max-w-xl mb-12 font-medium tracking-tight uppercase text-xs tracking-[0.2em]">İNSTAGRAM İÇİN DUMP BÖLME ARACI</p>
+        <p className="text-gray-400 max-w-xl mb-12 font-medium tracking-tight uppercase text-xs tracking-[0.2em]">Instagram için profesyonel Dump Bölme ve Kalite Artırma Aracı</p>
         <button onClick={triggerFileInput} className="w-full max-w-xl aspect-video bg-[#0c0c0c] border-2 border-dashed border-white/10 rounded-[48px] flex flex-col items-center justify-center group hover:border-white/30 transition-all p-12 shadow-2xl relative overflow-hidden">
            <div className="w-20 h-20 bg-white text-black rounded-3xl flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-transform"><Upload size={36} /></div>
            <p className="text-2xl font-black uppercase italic">Dosya Yükle</p>
@@ -506,3 +506,4 @@ const App = () => {
 };
 
 export default App;
+
