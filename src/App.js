@@ -1,13 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Upload, ChevronRight, User, Settings, Download, HelpCircle, 
-  Maximize, Minus, Plus, Image as ImageIcon, Video, Check, 
-  Layers, Sparkles, UserCheck, Palette, Sun, Eye, Loader2, 
-  ArrowLeft, X, RotateCcw, RotateCw, History, Monitor,
-  Zap, AlertTriangle, ChevronDown, CheckCircle2, Scissors,
-  Grid, Layout, DownloadCloud, FileImage, Fullscreen, Rows,
-  Wand2, FileType, ShieldCheck, Cpu, Activity, Target, Lock, Shield, ServerOff, HelpCircle as HelpIcon, Info, MessageCircleQuestion, FileQuestion, ZoomIn
+  Upload, Minus, Plus, Image as ImageIcon, Video, Check, 
+  Sparkles,  
+  X, Monitor,
+  Zap, CheckCircle2,
+  Grid, DownloadCloud, FileImage, 
+  ShieldCheck, Cpu, Activity, Target, Lock, ServerOff, HelpCircle as HelpIcon, Info, MessageCircleQuestion, FileQuestion, ZoomIn, Maximize,
+  Download, Eye, Shield // Shield ikonu buraya eklendi
 } from 'lucide-react';
+
+// --- ICONS (Custom) ---
+const DownloadIcon = ({ size = 24, strokeWidth = 2.5, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" x2="12" y1="15" y2="3" />
+  </svg>
+);
 
 // --- CONSTANTS ---
 const SPLITTER_STATUS_MSGS = [
@@ -82,7 +91,6 @@ const App = () => {
   const handleDockPointerDown = (e) => {
     if (e.target.closest('button') || e.target.closest('input')) return;
     setIsDraggingDock(true);
-    // Touch event kontrolü
     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
     const clientY = e.clientY || (e.touches && e.touches[0].clientY);
     
@@ -97,7 +105,6 @@ const App = () => {
 
   const handleDockPointerMove = (e) => {
     if (!isDraggingDock) return;
-    // Touch event kontrolü
     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
     const clientY = e.clientY || (e.touches && e.touches[0].clientY);
 
@@ -107,7 +114,7 @@ const App = () => {
     });
   };
 
-  const handleDockPointerUp = (e) => {
+  const handleDockPointerUp = () => {
     setIsDraggingDock(false);
   };
 
@@ -161,7 +168,6 @@ const App = () => {
     }
   };
 
-  // --- ANA MENÜYE DÖNÜŞ FONKSİYONU ---
   const handleGoHome = () => {
     setPage('landing');
     setUploadedFile(null);
@@ -174,8 +180,9 @@ const App = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (!shouldResetList.current && fileList.length >= 10) {
-      showToast("Maksimum 10 dosya ekleyebilirsiniz.");
+    // Maksimum dosya sayısı kontrolü
+    if (!shouldResetList.current && fileList.length >= 20) { 
+      showToast("Maksimum 20 dosya eklenebilir.");
       return;
     }
 
@@ -183,7 +190,7 @@ const App = () => {
     activeUrlsRef.current.push(url);
 
     const type = file.type.startsWith('video/') ? 'video' : 'image';
-    const newFileObj = { url, type, id: Date.now() };
+    const newFileObj = { url, type, id: Date.now() + Math.random() }; 
     
     if (shouldResetList.current) {
       setFileList([newFileObj]);
@@ -325,11 +332,13 @@ const App = () => {
       const link = document.createElement('a');
       link.href = dataUrl;
       link.download = `${name}.${downloadFormat}`;
+      link.target = "_blank"; 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error("İndirme hatası:", error);
+      showToast("İndirme başlatılamadı. Lütfen tekrar deneyin.");
     }
   };
 
@@ -401,15 +410,15 @@ const App = () => {
           <>
             <button 
               onClick={triggerNewUpload}
-              className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-lg border border-white/10"
+              className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-lg border border-white/10 whitespace-nowrap"
             >
-               <Upload size={16} /> <span className="hidden md:inline">Yeni Yükleme</span><span className="md:hidden">Yeni</span>
+               <Upload size={16} /> Yeni Yükleme
             </button>
             <button 
               onClick={() => splitSlides.forEach((s, i) => setTimeout(() => downloadFile(s.dataUrl, `slide_${i+1}`), i * 300))} 
-              className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+              className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)] whitespace-nowrap"
             >
-               <Download size={16} /> <span className="hidden md:inline">Tümünü İndir</span><span className="md:hidden">İndir</span>
+               <DownloadCloud size={16} /> Tümünü İndir
             </button>
           </>
         )}
@@ -519,11 +528,10 @@ const App = () => {
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={handleFileSelect} />
       <Header isEditor={true} />
       <FeatureInfoModal />
-      {/* MOBİL UYUMLU LAYOUT - GÜNCELLENDİ */}
       <main className="flex-1 pt-16 lg:pt-20 flex flex-col lg:flex-row overflow-hidden relative">
         
         {/* KAYDIRILABİLİR İÇERİK ALANI (Canvas + Ayarlar) */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden custom-scrollbar pb-24 lg:pb-0"> 
+        <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden custom-scrollbar pb-28 lg:pb-0"> 
           
           {/* 1. AYARLAR (Telefonda resmin altında, Masaüstünde solda) */}
           <aside className="w-full lg:w-[320px] h-auto lg:h-full bg-[#0a0a0a] border-r border-white/5 flex flex-col order-2 lg:order-1 z-20 shrink-0">
@@ -557,7 +565,7 @@ const App = () => {
             <div className="p-6 lg:p-8 border-t border-white/5 hidden lg:block">
                <button onClick={() => processSplit(uploadedFile, fileType === 'video')} disabled={isProcessing || !uploadedFile} className={`w-full py-4 lg:py-5 rounded-[24px] font-black text-xs transition-all shadow-2xl ${isProcessing || !uploadedFile ? 'bg-white/5 text-gray-600' : 'bg-white text-black hover:bg-gray-200 active:scale-95 uppercase tracking-widest'}`}>{isProcessing ? 'İŞLENİYOR...' : 'YENİDEN BÖL'}</button>
             </div>
-            {/* Mobilde "Yeniden Böl" butonu ayarların altına eklendi, kaydırma ile ulaşılabilir */}
+            {/* Mobilde "Yeniden Böl" butonu ayarların altına eklendi */}
             <div className="p-6 lg:hidden border-t border-white/5 pb-8">
                <button onClick={() => processSplit(uploadedFile, fileType === 'video')} disabled={isProcessing || !uploadedFile} className={`w-full py-4 rounded-[24px] font-black text-xs transition-all shadow-2xl ${isProcessing || !uploadedFile ? 'bg-white/5 text-gray-600' : 'bg-white text-black hover:bg-gray-200 active:scale-95 uppercase tracking-widest'}`}>{isProcessing ? 'İŞLENİYOR...' : 'YENİDEN BÖL'}</button>
             </div>
@@ -600,19 +608,53 @@ const App = () => {
                                         window.addEventListener('mouseup', handleMouseUp);
                                       }}
                                       onTouchStart={(e) => {
-                                        if(e.touches.length !== 1) return;
                                         const img = e.target;
+                                        // Pinch-to-zoom logic
+                                        if (e.touches.length === 2) {
+                                          e.preventDefault(); // Prevent default browser zoom
+                                          const dist = Math.hypot(
+                                            e.touches[0].pageX - e.touches[1].pageX,
+                                            e.touches[0].pageY - e.touches[1].pageY
+                                          );
+                                          const initialZoom = zoom;
+                                          
+                                          const handlePinchMove = (moveEvent) => {
+                                            if (moveEvent.touches.length === 2) {
+                                               const newDist = Math.hypot(
+                                                moveEvent.touches[0].pageX - moveEvent.touches[1].pageX,
+                                                moveEvent.touches[0].pageY - moveEvent.touches[1].pageY
+                                              );
+                                              const newZoom = initialZoom * (newDist / dist);
+                                              setZoom(Math.max(10, Math.min(200, newZoom)));
+                                            }
+                                          };
+                                          
+                                          const handlePinchEnd = () => {
+                                            window.removeEventListener('touchmove', handlePinchMove);
+                                            window.removeEventListener('touchend', handlePinchEnd);
+                                          };
+                                          window.addEventListener('touchmove', handlePinchMove, { passive: false });
+                                          window.addEventListener('touchend', handlePinchEnd);
+                                          return;
+                                        }
+
+                                        // Drag logic
+                                        if(e.touches.length !== 1) return;
+                                        
                                         const style = window.getComputedStyle(img);
                                         const matrix = new DOMMatrix(style.transform);
                                         const currentX = matrix.m41;
                                         const currentY = matrix.m42;
                                         const startX = e.touches[0].clientX;
                                         const startY = e.touches[0].clientY;
+
                                         const handleTouchMove = (moveEvent) => {
-                                          moveEvent.preventDefault(); 
-                                          const dx = moveEvent.touches[0].clientX - startX;
-                                          const dy = moveEvent.touches[0].clientY - startY;
-                                          img.style.transform = `translate(${currentX + dx}px, ${currentY + dy}px)`;
+                                          if (moveEvent.touches.length === 1) {
+                                            moveEvent.preventDefault(); 
+                                            const dx = moveEvent.touches[0].clientX - startX;
+                                            const dy = moveEvent.touches[0].clientY - startY;
+                                            img.style.transform = `translate(${currentX + dx}px, ${currentY + dy}px)`;
+                                          }
                                         };
                                         const handleTouchEnd = () => {
                                           window.removeEventListener('touchmove', handleTouchMove);
@@ -623,7 +665,7 @@ const App = () => {
                                       }}
                                     />
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-50 pointer-events-none rounded-2xl md:rounded-3xl">
-                                       <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); downloadFile(s.dataUrl, `part_${s.id}`); }} className="bg-white text-black w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_50px_rgba(255,255,255,0.4)] cursor-pointer pointer-events-auto" title="Bu parçayı indir"><Download size={24} strokeWidth={2.5} /></button>
+                                       <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); downloadFile(s.dataUrl, `part_${s.id}`); }} className="bg-white text-black w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_50px_rgba(255,255,255,0.4)] cursor-pointer pointer-events-auto" title="Bu parçayı indir"><DownloadCloud size={24} strokeWidth={2.5} /></button>
                                        <div className="absolute top-4 left-4 text-white font-bold bg-black/50 px-3 py-1 rounded-full text-[10px] border border-white/20">PARÇA {s.id}</div>
                                     </div>
                                 </div>
@@ -658,7 +700,7 @@ const App = () => {
 
                         <div className="flex items-center gap-2 md:gap-4 pl-2 justify-end shrink-0 flex-1">
                           <button onClick={() => setZoom(prev => Math.max(10, prev - 10))} onPointerDown={(e) => e.stopPropagation()} className="text-gray-500 hover:text-white transition-colors shrink-0 p-2"><Minus size={14} /></button>
-                          <div className="flex items-center gap-2 group/zoom"><span className="text-[10px] md:text-xs font-black text-white/50 w-8 text-center group-hover/zoom:text-white transition-colors shrink-0">{zoom}%</span></div>
+                          <div className="flex items-center gap-2 group/zoom"><span className="text-[10px] md:text-xs font-black text-white/50 w-8 text-center group-hover/zoom:text-white transition-colors shrink-0">{Math.round(zoom)}%</span></div>
                           <button onClick={() => setZoom(prev => Math.min(200, prev + 10))} onPointerDown={(e) => e.stopPropagation()} className="text-gray-500 hover:text-white transition-colors shrink-0 p-2"><Plus size={14} /></button>
                           <button onClick={() => setZoom(100)} onPointerDown={(e) => e.stopPropagation()} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-gray-400 hover:text-white ml-1 border border-white/5 shrink-0" title="Sıfırla"><Maximize size={12} /></button>
                         </div>
@@ -685,7 +727,7 @@ const App = () => {
 
         {/* 3. GEÇMİŞ (Telefonda EN ALTTA SABİT, Masaüstünde Sağda) */}
         <aside className="
-          fixed bottom-0 left-0 right-0 h-24 lg:static lg:h-full lg:w-[120px] 
+          fixed bottom-0 left-0 right-0 h-28 lg:static lg:h-full lg:w-[120px] 
           bg-[#080808]/95 backdrop-blur-xl lg:bg-[#080808] 
           border-t lg:border-t-0 lg:border-l border-white/10 
           flex flex-row lg:flex-col items-center 
@@ -696,15 +738,56 @@ const App = () => {
           order-3
         ">
             {fileList.length === 0 && <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest whitespace-nowrap lg:whitespace-normal text-center w-full">GEÇMİŞ BOŞ</div>}
-            {fileList.map((file, idx) => (
-              <div key={file.id} onClick={() => { if (uploadedFile === file.url) return; setIsProcessing(false); setUploadedFile(file.url); setFileType(file.type); setSplitCount(4); setSplitSlides([]); setPage('loading'); setTimeout(() => setPage('editor'), 600); }} className={`relative group rounded-[16px] lg:rounded-[20px] overflow-hidden aspect-square h-16 lg:h-auto lg:w-full border-2 shadow-xl cursor-pointer transition-all shrink-0 ${uploadedFile === file.url ? 'border-white ring-2 ring-white/20' : 'border-white/10 opacity-60 hover:opacity-100'}`}>
-                  {file.type === 'video' ? <video src={file.url} className="w-full h-full object-cover" /> : <img src={file.url} className="w-full h-full object-cover" alt="Thumb" />}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><button onClick={(e) => { e.stopPropagation(); const newList = fileList.filter((_, i) => i !== idx); setFileList(newList); if (uploadedFile === file.url) { if (newList.length > 0) { setUploadedFile(newList[0].url); setFileType(newList[0].type); setIsProcessing(false); setSplitSlides([]); setSplitCount(4); setPage('loading'); setTimeout(() => setPage('editor'), 600); } else { setUploadedFile(null); setPage('landing'); } } }} className="p-1.5 lg:p-2 bg-red-500/80 hover:bg-red-500 rounded-lg text-white scale-90 lg:scale-75 group-hover:scale-100 transition-all"><X size={14} /></button></div>
-              </div>
-            ))}
-            <div className="flex lg:flex-col items-center gap-3 shrink-0">
-              {fileList.length > 0 && (<span className="text-[9px] lg:text-[10px] font-black text-gray-500 uppercase tracking-widest">{fileList.length}/10</span>)}
-              {fileList.length < 10 && (<div onClick={triggerFileInput} className="h-16 w-16 lg:h-auto lg:w-full lg:aspect-square border-2 border-dashed border-white/10 rounded-[16px] lg:rounded-[20px] flex items-center justify-center text-gray-800 hover:text-white transition-all cursor-pointer shadow-inner"><Plus size={20} /></div>)}
+            <div className="flex flex-row lg:flex-col gap-4">
+              {fileList.map((file, idx) => (
+                <div 
+                  key={file.id} 
+                  onClick={() => { 
+                    if (uploadedFile === file.url) return; 
+                    setIsProcessing(false); 
+                    setUploadedFile(file.url); 
+                    setFileType(file.type); 
+                    setSplitCount(4); 
+                    setSplitSlides([]); 
+                    setPage('loading'); 
+                    setTimeout(() => setPage('editor'), 600); 
+                  }} 
+                  className={`relative group rounded-[16px] lg:rounded-[20px] overflow-hidden aspect-square h-16 w-16 lg:h-auto lg:w-full border-2 shadow-xl cursor-pointer transition-all shrink-0 ${uploadedFile === file.url ? 'border-white ring-2 ring-white/20' : 'border-white/10 opacity-60 hover:opacity-100'}`}
+                >
+                    {file.type === 'video' ? <video src={file.url} className="w-full h-full object-cover" /> : <img src={file.url} className="w-full h-full object-cover" alt="Thumb" />}
+                    
+                    {/* SİLME BUTONU: Touch event ile karışmaması için özel alan */}
+                    <div 
+                      className="absolute top-0 right-0 p-1 bg-black/60 rounded-bl-lg z-10"
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        const newList = fileList.filter((_, i) => i !== idx); 
+                        setFileList(newList); 
+                        if (uploadedFile === file.url) { 
+                          if (newList.length > 0) { 
+                            setUploadedFile(newList[0].url); 
+                            setFileType(newList[0].type); 
+                            setIsProcessing(false); 
+                            setSplitSlides([]); 
+                            setSplitCount(4); 
+                            setPage('loading'); 
+                            setTimeout(() => setPage('editor'), 600); 
+                          } else { 
+                            setUploadedFile(null); 
+                            setPage('landing'); 
+                          } 
+                        } 
+                      }}
+                    >
+                      <X size={12} className="text-white hover:text-red-500 transition-colors" />
+                    </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex lg:flex-col items-center gap-3 shrink-0 ml-auto lg:ml-0 border-l lg:border-l-0 lg:border-t border-white/10 pl-4 lg:pl-0 lg:pt-4">
+              {fileList.length > 0 && (<span className="text-[9px] lg:text-[10px] font-black text-gray-500 uppercase tracking-widest">{fileList.length}/20</span>)}
+              {fileList.length < 20 && (<div onClick={triggerFileInput} className="h-16 w-16 lg:h-auto lg:w-full lg:aspect-square border-2 border-dashed border-white/10 rounded-[16px] lg:rounded-[20px] flex items-center justify-center text-gray-800 hover:text-white transition-all cursor-pointer shadow-inner"><Plus size={20} /></div>)}
             </div>
         </aside>
       </main>
