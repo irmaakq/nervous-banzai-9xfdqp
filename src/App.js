@@ -82,18 +82,28 @@ const App = () => {
   const handleDockPointerDown = (e) => {
     if (e.target.closest('button') || e.target.closest('input')) return;
     setIsDraggingDock(true);
+    // Touch event kontrolü
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    
     dragStartRef.current = {
-      x: e.clientX - dockPos.x,
-      y: e.clientY - dockPos.y
+      x: clientX - dockPos.x,
+      y: clientY - dockPos.y
     };
-    e.target.setPointerCapture(e.pointerId);
+    if (e.target.setPointerCapture) {
+       e.target.setPointerCapture(e.pointerId);
+    }
   };
 
   const handleDockPointerMove = (e) => {
     if (!isDraggingDock) return;
+    // Touch event kontrolü
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
     setDockPos({
-      x: e.clientX - dragStartRef.current.x,
-      y: e.clientY - dragStartRef.current.y
+      x: clientX - dragStartRef.current.x,
+      y: clientY - dragStartRef.current.y
     });
   };
 
@@ -375,32 +385,31 @@ const App = () => {
   );
 
   const Header = ({ isEditor }) => (
-    <header className={`fixed top-0 left-0 right-0 z-[70] px-8 py-4 flex items-center justify-between backdrop-blur-3xl ${isEditor ? 'bg-black/90 border-b border-white/5' : 'bg-transparent'}`}>
-      <div className="flex items-center gap-6 ml-10">
+    <header className={`fixed top-0 left-0 right-0 z-[70] px-4 md:px-8 py-4 flex items-center justify-between backdrop-blur-3xl transition-all ${isEditor ? 'bg-black/90 border-b border-white/5' : 'bg-transparent'}`}>
+      <div className="flex items-center gap-3 md:gap-6 ml-2 md:ml-10">
         <div 
           className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-all" 
           onClick={handleGoHome}
           title="Ana Menüye Dön"
         >
-          <div className="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-black italic shadow-2xl transition-all text-2xl tracking-tighter group-hover:scale-105">D</div>
-          <span className="text-2xl font-black tracking-tighter uppercase hidden sm:block italic">Dump Splitter</span>
+          <div className="w-8 h-8 md:w-10 md:h-10 bg-white text-black rounded-xl flex items-center justify-center font-black italic shadow-2xl transition-all text-xl md:text-2xl tracking-tighter group-hover:scale-105">D</div>
+          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase hidden sm:block italic">Dump Splitter</span>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
         {isEditor && (
           <>
-            {/* GÜNCELLENDİ: Buton ismi "Yeni Yükleme" yapıldı */}
             <button 
               onClick={triggerNewUpload}
-              className="bg-white text-black px-6 py-2.5 rounded-xl text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-lg border border-white/10"
+              className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-lg border border-white/10"
             >
-               <Upload size={18} /> Yeni Yükleme
+               <Upload size={16} /> <span className="hidden md:inline">Yeni Yükleme</span><span className="md:hidden">Yeni</span>
             </button>
             <button 
               onClick={() => splitSlides.forEach((s, i) => setTimeout(() => downloadFile(s.dataUrl, `slide_${i+1}`), i * 300))} 
-              className="bg-white text-black px-6 py-2.5 rounded-xl text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+              className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 hover:bg-gray-200 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             >
-               <Download size={18} /> Tümünü İndir
+               <Download size={16} /> <span className="hidden md:inline">Tümünü İndir</span><span className="md:hidden">İndir</span>
             </button>
           </>
         )}
@@ -409,11 +418,11 @@ const App = () => {
   );
 
   const PrivacyModal = () => (
-    <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-500">
-      <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl max-w-3xl w-full p-10 relative shadow-2xl animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-500 overflow-y-auto">
+      <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl max-w-3xl w-full p-6 md:p-10 relative shadow-2xl animate-in zoom-in-95 duration-300 my-auto">
         <div className="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
           <div className="p-3 bg-green-500/10 rounded-2xl animate-pulse"><ShieldCheck size={32} className="text-green-500" /></div>
-          <div><h2 className="text-2xl font-black text-white uppercase tracking-tighter">Güvenlik ve Gizlilik Protokolü</h2><p className="text-xs text-gray-500 font-medium uppercase tracking-widest mt-1">Son Güncelleme: 30.12.2025 • Sürüm 2.4.0 (Secure Build)</p></div>
+          <div><h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Güvenlik ve Gizlilik Protokolü</h2><p className="text-xs text-gray-500 font-medium uppercase tracking-widest mt-1">Son Güncelleme: 30.12.2025 • Sürüm 2.4.0 (Secure Build)</p></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           <div className="bg-white/[0.03] p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors"><h3 className="text-white font-bold mb-3 flex items-center gap-3"><Lock size={18} className="text-blue-400"/><span className="uppercase tracking-tight text-xs">İstemci Taraflı İşleme</span></h3><p className="text-gray-400 leading-relaxed text-xs">Dump Splitter, dosyalarınızı <strong>uzak bir sunucuya (Cloud) yüklemez.</strong> Tüm işlemler tarayıcınızın belleğinde (HTML5 Canvas) gerçekleşir. Verileriniz cihazınızdan asla dışarı çıkmaz.</p></div>
@@ -428,7 +437,7 @@ const App = () => {
 
   const HowToModal = () => (
     <div className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl max-w-lg w-full p-8 relative shadow-2xl">
+      <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl max-w-lg w-full p-8 relative shadow-2xl overflow-y-auto max-h-[90vh]">
         <button onClick={() => setShowHowTo(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"><X size={24} /></button>
         <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-8 text-center">Nasıl Kullanılır?</h2>
         <div className="space-y-6">
@@ -443,7 +452,7 @@ const App = () => {
 
   const AboutModal = () => (
     <div className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl max-w-2xl w-full p-10 relative shadow-2xl">
+      <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl max-w-2xl w-full p-8 md:p-10 relative shadow-2xl overflow-y-auto max-h-[90vh]">
         <button onClick={() => setShowAbout(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"><X size={24} /></button>
         <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">DUMP SPLITTER NEDİR?</h2>
         <div className="text-gray-400 text-sm leading-relaxed mb-8 space-y-4">
@@ -471,22 +480,23 @@ const App = () => {
 
   if (page === 'landing') {
     return (
-      <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 text-center relative">
+      <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 text-center relative overflow-x-hidden">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={handleFileSelect} />
         <Header isEditor={false} />
-        <div className="absolute top-8 right-8 z-[80] flex items-center gap-3">
-             <button onClick={() => setShowAbout(true)} className="flex items-center gap-2 text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full hover:bg-white/5"><Info size={14} /> DUMP SPLITTER NEDİR?</button>
-             <button onClick={() => setShowHowTo(true)} className="flex items-center gap-2 text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full hover:bg-white/5"><HelpIcon size={14} /> Nasıl Kullanılır?</button>
-             <button onClick={() => setShowFAQ(true)} className="flex items-center gap-2 text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full hover:bg-white/5"><MessageCircleQuestion size={14} /> SSS</button>
-            <button onClick={() => setShowPrivacy(true)} className="flex items-center gap-2 text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full hover:bg-white/5"><ShieldCheck size={14} /> Gizlilik</button>
+        <div className="absolute top-8 right-4 md:right-8 z-[80] flex flex-wrap justify-end gap-2 md:gap-3">
+             <button onClick={() => setShowAbout(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><Info size={12} /> <span className="hidden md:inline">DUMP SPLITTER NEDİR?</span><span className="md:hidden">NEDİR?</span></button>
+             <button onClick={() => setShowHowTo(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><HelpIcon size={12} /> <span className="hidden md:inline">Nasıl Kullanılır?</span><span className="md:hidden">NASIL?</span></button>
+             <button onClick={() => setShowFAQ(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><MessageCircleQuestion size={12} /> SSS</button>
+            <button onClick={() => setShowPrivacy(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><ShieldCheck size={12} /> <span className="hidden md:inline">Gizlilik</span></button>
         </div>
         <div className="absolute top-0 -z-10 w-full h-full bg-gradient-to-b from-blue-900/10 via-transparent to-transparent" />
-        <h1 className="text-7xl md:text-9xl font-black tracking-tighter mb-8 leading-normal pt-48 pb-6 italic uppercase">DUMP <br /> SPLITTER</h1>
-        <p className="text-gray-400 max-w-xl mb-12 font-medium tracking-tight uppercase text-xs tracking-[0.2em]">İNSTAGRAM İÇİN DUMP BÖLME ARACI</p>
-        <button onClick={triggerFileInput} className="w-full max-w-xl aspect-video bg-[#0c0c0c] border-2 border-dashed border-white/10 rounded-[48px] flex flex-col items-center justify-center group hover:border-white/30 transition-all p-12 shadow-2xl relative overflow-hidden">
-           <div className="w-20 h-20 bg-white text-black rounded-3xl flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-transform"><Upload size={36} /></div>
-           <p className="text-2xl font-black uppercase italic">Dosya Yükle</p>
+        <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-4 md:mb-8 leading-normal pt-32 md:pt-48 pb-4 md:pb-6 italic uppercase">DUMP <br /> SPLITTER</h1>
+        <p className="text-gray-400 max-w-xl mb-8 md:mb-12 font-medium tracking-tight uppercase text-[10px] md:text-xs tracking-[0.2em] px-4">Instagram için profesyonel Dump Bölme ve Kalite Artırma Aracı</p>
+        <button onClick={triggerFileInput} className="w-full max-w-xl aspect-video bg-[#0c0c0c] border-2 border-dashed border-white/10 rounded-[32px] md:rounded-[48px] flex flex-col items-center justify-center group hover:border-white/30 transition-all p-8 md:p-12 shadow-2xl relative overflow-hidden mx-4">
+           <div className="w-16 h-16 md:w-20 md:h-20 bg-white text-black rounded-3xl flex items-center justify-center mb-6 md:mb-8 shadow-2xl group-hover:scale-110 transition-transform"><Upload size={28} className="md:w-9 md:h-9" /></div>
+           <p className="text-lg md:text-2xl font-black uppercase italic">Dosya Yükle</p>
         </button>
+        <p className="text-gray-500 mt-6 text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-60">Fotoğraflar tarayıcında işlenir, sunucuya yüklenmez.</p>
         {showPrivacy && <PrivacyModal />}
         {showHowTo && <HowToModal />}
         {showAbout && <AboutModal />}
@@ -498,8 +508,8 @@ const App = () => {
   if (page === 'loading') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-white">
-        <div className="w-20 h-20 border-4 border-white/5 border-t-white rounded-[32px] animate-spin mb-10 shadow-2xl" />
-        <h2 className="text-2xl font-black uppercase italic tracking-widest animate-pulse tracking-tighter">İşleniyor</h2>
+        <div className="w-16 h-16 md:w-20 md:h-20 border-4 border-white/5 border-t-white rounded-[32px] animate-spin mb-8 md:mb-10 shadow-2xl" />
+        <h2 className="text-xl md:text-2xl font-black uppercase italic tracking-widest animate-pulse tracking-tighter">İşleniyor</h2>
       </div>
     );
   }
@@ -509,9 +519,167 @@ const App = () => {
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={handleFileSelect} />
       <Header isEditor={true} />
       <FeatureInfoModal />
-      <main className="flex-1 pt-20 flex overflow-hidden">
-        <aside className="w-[300px] border-r border-white/5 bg-[#0a0a0a] flex flex-col shadow-2xl z-20">
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+      {/* MOBİL UYUMLU LAYOUT YAPISI */}
+      <main className="flex-1 pt-20 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        {/* ORTA CANVAS (MOBİLDE ÜSTTE) */}
+        <section className="flex-1 bg-[#050505] p-2 md:p-6 flex flex-col items-center justify-center relative overflow-hidden order-1 lg:order-2 z-10">
+          <div className="relative w-full h-full max-w-[95vw] bg-black rounded-[32px] md:rounded-[56px] overflow-hidden border border-white/10 shadow-[0_0_150px_rgba(0,0,0,1)] flex items-center justify-center group/canvas">
+              {uploadedFile ? (
+                <div className="w-full h-full p-4 md:p-12 flex flex-col overflow-y-auto custom-scrollbar bg-black/40">
+                  <div className={`w-full ${splitCount === 1 ? 'max-w-none px-2 md:px-4' : 'max-w-6xl'} mx-auto space-y-8 md:space-y-16 pb-32 md:pb-40 flex flex-col items-center`}>
+                      <div className="text-center mt-4"><h3 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic">Bölünen Parçalar</h3></div>
+                      <div className={`grid gap-6 md:gap-12 w-full justify-items-center ${splitCount === 1 ? 'grid-cols-1' : (splitCount % 2 !== 0 || splitCount === 2 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2')}`}>
+                          {splitSlides.length > 0 ? splitSlides.map((s) => (
+                              <div key={`${uploadedFile}-${s.id}`} style={{ aspectRatio: s.aspectRatio, transform: `scale(${zoom / 100})`, transformOrigin: 'center center', transition: 'transform 0.2s' }} className="relative w-full max-w-[500px] h-auto max-h-[50vh] md:max-h-[70vh] bg-white/5 group hover:scale-[1.01] transition-all flex items-center justify-center snap-center rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
+                                  <img 
+                                    src={s.dataUrl} 
+                                    className="w-full h-full object-contain drop-shadow-2xl rounded-2xl md:rounded-3xl cursor-move touch-none" 
+                                    alt="Slide" 
+                                    draggable="false"
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      const img = e.target;
+                                      // Eğer daha önce transform yoksa matrix'ten 0,0 başlat
+                                      const style = window.getComputedStyle(img);
+                                      const matrix = new DOMMatrix(style.transform);
+                                      const currentX = matrix.m41;
+                                      const currentY = matrix.m42;
+                                      
+                                      const startX = e.clientX;
+                                      const startY = e.clientY;
+
+                                      const handleMouseMove = (moveEvent) => {
+                                        const dx = moveEvent.clientX - startX;
+                                        const dy = moveEvent.clientY - startY;
+                                        img.style.transform = `translate(${currentX + dx}px, ${currentY + dy}px)`;
+                                      };
+
+                                      const handleMouseUp = () => {
+                                        window.removeEventListener('mousemove', handleMouseMove);
+                                        window.removeEventListener('mouseup', handleMouseUp);
+                                      };
+
+                                      window.addEventListener('mousemove', handleMouseMove);
+                                      window.addEventListener('mouseup', handleMouseUp);
+                                    }}
+                                    onTouchStart={(e) => {
+                                      // Touch için varsayılan davranışı (scroll) engellemiyoruz ki kullanıcı sayfayı kaydırabilsin
+                                      // Ancak resim üzerinde sürüklemeye başladığında engellenebilir.
+                                      // Şimdilik sadece resim hareketi:
+                                      if(e.touches.length !== 1) return;
+                                      
+                                      const img = e.target;
+                                      const style = window.getComputedStyle(img);
+                                      const matrix = new DOMMatrix(style.transform);
+                                      const currentX = matrix.m41;
+                                      const currentY = matrix.m42;
+                                      
+                                      const startX = e.touches[0].clientX;
+                                      const startY = e.touches[0].clientY;
+
+                                      const handleTouchMove = (moveEvent) => {
+                                        moveEvent.preventDefault(); // Resim sürüklerken sayfa kaymasın
+                                        const dx = moveEvent.touches[0].clientX - startX;
+                                        const dy = moveEvent.touches[0].clientY - startY;
+                                        img.style.transform = `translate(${currentX + dx}px, ${currentY + dy}px)`;
+                                      };
+
+                                      const handleTouchEnd = () => {
+                                        window.removeEventListener('touchmove', handleTouchMove);
+                                        window.removeEventListener('touchend', handleTouchEnd);
+                                      };
+
+                                      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+                                      window.addEventListener('touchend', handleTouchEnd);
+                                    }}
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-50 pointer-events-none rounded-2xl md:rounded-3xl">
+                                     <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); downloadFile(s.dataUrl, `part_${s.id}`); }} className="bg-white text-black w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_50px_rgba(255,255,255,0.4)] cursor-pointer pointer-events-auto" title="Bu parçayı indir"><Download size={24} strokeWidth={2.5} /></button>
+                                     <div className="absolute top-4 left-4 text-white font-bold bg-black/50 px-3 py-1 rounded-full text-[10px] border border-white/20">PARÇA {s.id}</div>
+                                  </div>
+                              </div>
+                          )) : (
+                              <div className="w-full text-center py-40 opacity-10 italic text-xl md:text-2xl font-black uppercase tracking-widest">Medya Analiz Ediliyor...</div>
+                          )}
+                      </div>
+                  </div>
+                  
+                  {splitSlides.length > 0 && (
+                    <div 
+                      onPointerDown={handleDockPointerDown}
+                      onPointerMove={handleDockPointerMove}
+                      onPointerUp={handleDockPointerUp}
+                      style={{ 
+                        left: '50%', 
+                        bottom: '20px', 
+                        transform: `translate(calc(-50% + ${dockPos.x}px), ${dockPos.y}px)`,
+                        cursor: isDraggingDock ? 'grabbing' : 'grab',
+                        touchAction: 'none' // Mobilde menüyü rahat sürüklemek için
+                      }}
+                      className="fixed bg-black/90 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-center gap-4 md:gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 animate-in slide-in-from-bottom-5 w-[90%] max-w-sm md:w-auto md:max-w-[90vw] select-none"
+                    >
+                      <div className="flex flex-col items-start gap-1 border-r border-white/10 pr-4 md:pr-6 min-w-[80px] md:min-w-[140px] shrink-0 pointer-events-none">
+                          <span className="text-[8px] md:text-[10px] font-black text-gray-500 uppercase tracking-wider">Çözünürlük</span>
+                          <div className="flex items-center gap-1 md:gap-2 text-xs md:text-base font-black text-white italic">
+                            <span>{mediaDimensions.width}</span>
+                            <span className="text-gray-600 text-[10px] md:text-xs">×</span>
+                            <span>{mediaDimensions.height}</span>
+                          </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 md:gap-4 pl-2 justify-end shrink-0 flex-1">
+                        <button 
+                          onClick={() => setZoom(prev => Math.max(10, prev - 10))} 
+                          onPointerDown={(e) => e.stopPropagation()}
+                          className="text-gray-500 hover:text-white transition-colors shrink-0 p-2"
+                        >
+                          <Minus size={14} />
+                        </button>
+                        
+                        <div className="flex items-center gap-2 group/zoom">
+                           <span className="text-[10px] md:text-xs font-black text-white/50 w-8 text-center group-hover/zoom:text-white transition-colors shrink-0">{zoom}%</span>
+                        </div>
+
+                        <button 
+                          onClick={() => setZoom(prev => Math.min(200, prev + 10))} 
+                          onPointerDown={(e) => e.stopPropagation()}
+                          className="text-gray-500 hover:text-white transition-colors shrink-0 p-2"
+                        >
+                          <Plus size={14} />
+                        </button>
+                        
+                        <button 
+                          onClick={() => setZoom(100)} 
+                          onPointerDown={(e) => e.stopPropagation()}
+                          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-gray-400 hover:text-white ml-1 border border-white/5 shrink-0" 
+                          title="Sıfırla"
+                        >
+                          <Maximize size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+               </div>
+             ) : (
+               <div className="text-center p-10 md:p-20 flex flex-col items-center">
+                  <div className="w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-[48px] flex items-center justify-center mb-6 md:mb-10 text-gray-700 border border-white/5 shadow-inner"><ImageIcon size={40} className="md:w-12 md:h-12" /></div>
+                  <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tighter uppercase tracking-widest">Medya Bekleniyor</h3>
+                  <button onClick={triggerFileInput} className="bg-white text-black px-10 py-4 md:px-14 md:py-5 rounded-[24px] font-black shadow-2xl hover:bg-gray-200 transition-all active:scale-95 uppercase tracking-widest text-[10px] md:text-xs">Dosya Seç</button>
+               </div>
+             )}
+             {isProcessing && (
+               <div className="absolute inset-0 z-[100] bg-black/98 backdrop-blur-3xl flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 md:w-20 md:h-20 border-[6px] border-white/5 border-t-white rounded-[40px] animate-spin mb-8 md:mb-10 shadow-2xl" />
+                  <div className="space-y-4 text-center">{aiLogs.map((log, i) => (<p key={i} className="text-xs md:text-sm font-black text-gray-400 px-10 uppercase tracking-[0.3em] italic">{log}</p>))}</div>
+               </div>
+             )}
+          </div>
+        </section>
+
+        {/* SOL PANEL (AYARLAR) - MOBİLDE ALTA GELİR */}
+        <aside className="w-full lg:w-[300px] h-auto lg:h-full border-t lg:border-t-0 lg:border-r border-white/5 bg-[#0a0a0a] flex flex-col shadow-2xl z-20 order-2 lg:order-1 overflow-visible">
+          <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-6 space-y-6 lg:space-y-8">
             <div className="space-y-6">
                 <div className="p-5 bg-white/[0.03] border border-white/10 rounded-[28px] space-y-5 shadow-inner">
                   <div className="space-y-2"><FeatureToggle featureKey="aiEnhance" state={autoEnhance} setState={setAutoEnhance} shortDesc="Renkleri ve netliği yapay zeka ile otomatik iyileştirir." /></div>
@@ -522,9 +690,9 @@ const App = () => {
                 <div className="space-y-3">
                   <span className="text-[12px] font-black text-gray-500 uppercase tracking-widest block">Format</span>
                   <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
-                     {['png', 'jpg', 'webp'].map(fmt => (
-                       <button key={fmt} onClick={() => setDownloadFormat(fmt)} className={`flex-1 py-2 rounded-lg text-[12px] font-black uppercase transition-all ${downloadFormat === fmt ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-white'}`}>{fmt}</button>
-                     ))}
+                      {['png', 'jpg', 'webp'].map(fmt => (
+                        <button key={fmt} onClick={() => setDownloadFormat(fmt)} className={`flex-1 py-2 rounded-lg text-[12px] font-black uppercase transition-all ${downloadFormat === fmt ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-white'}`}>{fmt}</button>
+                      ))}
                   </div>
                 </div>
                 <div className="space-y-2 border-t border-white/5 pt-3"><FeatureToggle featureKey="ultraHd" state={ultraHdMode} setState={setUltraHdMode} shortDesc="Görsel çözünürlüğünü 2 katına çıkararak maksimum netlik sağlar." /></div>
@@ -538,121 +706,24 @@ const App = () => {
                 </div>
             </div>
           </div>
-          <div className="p-8 border-t border-white/5">
-             <button onClick={() => processSplit(uploadedFile, fileType === 'video')} disabled={isProcessing || !uploadedFile} className={`w-full py-5 rounded-[24px] font-black text-xs transition-all shadow-2xl ${isProcessing || !uploadedFile ? 'bg-white/5 text-gray-600' : 'bg-white text-black hover:bg-gray-200 active:scale-95 uppercase tracking-widest'}`}>{isProcessing ? 'İŞLENİYOR...' : 'YENİDEN BÖL'}</button>
+          <div className="p-6 lg:p-8 border-t border-white/5">
+             <button onClick={() => processSplit(uploadedFile, fileType === 'video')} disabled={isProcessing || !uploadedFile} className={`w-full py-4 lg:py-5 rounded-[24px] font-black text-xs transition-all shadow-2xl ${isProcessing || !uploadedFile ? 'bg-white/5 text-gray-600' : 'bg-white text-black hover:bg-gray-200 active:scale-95 uppercase tracking-widest'}`}>{isProcessing ? 'İŞLENİYOR...' : 'YENİDEN BÖL'}</button>
           </div>
         </aside>
 
-        <section className="flex-1 bg-[#050505] p-6 flex flex-col items-center justify-center relative overflow-hidden">
-          <div className="relative w-full h-full max-w-[95vw] bg-black rounded-[56px] overflow-hidden border border-white/10 shadow-[0_0_150px_rgba(0,0,0,1)] flex items-center justify-center group/canvas">
-             {uploadedFile ? (
-               <div className="w-full h-full p-12 flex flex-col overflow-y-auto custom-scrollbar bg-black/40">
-                  <div className={`w-full ${splitCount === 1 ? 'max-w-none px-4' : 'max-w-6xl'} mx-auto space-y-16 pb-40 flex flex-col items-center`}>
-                      <div className="text-center"><h3 className="text-4xl font-black uppercase tracking-tighter italic">Bölünen Parçalar</h3></div>
-                      <div className={`grid gap-12 w-full ${splitCount === 1 ? 'grid-cols-1' : (splitCount % 2 !== 0 || splitCount === 2 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2')}`}>
-                          {splitSlides.length > 0 ? splitSlides.map((s) => (
-                              <div key={`${uploadedFile}-${s.id}`} style={{ aspectRatio: s.aspectRatio, transform: `scale(${zoom / 100})`, transformOrigin: 'center center', transition: 'transform 0.2s' }} className="relative shrink-0 h-[60vh] md:h-[70vh] bg-transparent group hover:scale-[1.01] transition-all flex items-center justify-center snap-center">
-                                  <img src={s.dataUrl} className="w-full h-full object-contain drop-shadow-2xl rounded-3xl" alt="Slide" />
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-50 pointer-events-none rounded-3xl">
-                                     <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); downloadFile(s.dataUrl, `part_${s.id}`); }} className="bg-white text-black w-14 h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_50px_rgba(255,255,255,0.4)] cursor-pointer pointer-events-auto" title="Bu parçayı indir"><Download size={28} strokeWidth={2.5} /></button>
-                                     <div className="absolute top-4 left-4 text-white font-bold bg-black/50 px-3 py-1 rounded-full text-[10px] border border-white/20">PARÇA {s.id}</div>
-                                  </div>
-                              </div>
-                          )) : (
-                              <div className="w-full text-center py-40 opacity-10 italic text-2xl font-black uppercase tracking-widest">Medya Analiz Ediliyor...</div>
-                          )}
-                      </div>
-                  </div>
-                  
-                  {splitSlides.length > 0 && (
-                    <div 
-                      onPointerDown={handleDockPointerDown}
-                      onPointerMove={handleDockPointerMove}
-                      onPointerUp={handleDockPointerUp}
-                      style={{ 
-                        left: '50%', 
-                        bottom: '24px', 
-                        transform: `translate(calc(-50% + ${dockPos.x}px), ${dockPos.y}px)`,
-                        cursor: isDraggingDock ? 'grabbing' : 'grab'
-                      }}
-                      className="fixed bg-black/90 backdrop-blur-xl border border-white/10 rounded-full px-6 py-3 flex items-center justify-center gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 animate-in slide-in-from-bottom-5 w-auto max-w-[90vw] select-none"
-                    >
-                      {/* BOYUT BİLGİSİ - BÜYÜK VE NET */}
-                      <div className="flex flex-col items-start gap-1 border-r border-white/10 pr-6 min-w-[140px] shrink-0 pointer-events-none">
-                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-wider">Çözünürlük</span>
-                         <div className="flex items-center gap-2 text-base font-black text-white italic">
-                            <span>{mediaDimensions.width}</span>
-                            <span className="text-gray-600 text-xs">×</span>
-                            <span>{mediaDimensions.height}</span>
-                         </div>
-                      </div>
-
-                      {/* ZOOM DÜZENEĞİ */}
-                      <div className="flex items-center gap-4 pl-2 min-w-[140px] justify-end shrink-0">
-                        <button 
-                          onClick={() => setZoom(prev => Math.max(10, prev - 10))} 
-                          onPointerDown={(e) => e.stopPropagation()}
-                          className="text-gray-500 hover:text-white transition-colors shrink-0"
-                        >
-                          <Minus size={16} />
-                        </button>
-                        
-                        <div className="flex items-center gap-3 group/zoom">
-                           <input 
-                            type="range" 
-                            min="10" 
-                            max="200" 
-                            value={zoom} 
-                            onChange={(e) => setZoom(Number(e.target.value))} 
-                            onPointerDown={(e) => e.stopPropagation()}
-                            className="w-24 md:w-32 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white hover:bg-white/20 transition-all" 
-                           />
-                           <span className="text-xs font-black text-white/50 w-10 text-center group-hover/zoom:text-white transition-colors shrink-0">{zoom}%</span>
-                        </div>
-
-                        <button 
-                          onClick={() => setZoom(prev => Math.min(200, prev + 10))} 
-                          onPointerDown={(e) => e.stopPropagation()}
-                          className="text-gray-500 hover:text-white transition-colors shrink-0"
-                        >
-                          <Plus size={16} />
-                        </button>
-                        
-                        <button 
-                          onClick={() => setZoom(100)} 
-                          onPointerDown={(e) => e.stopPropagation()}
-                          className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-gray-400 hover:text-white ml-2 border border-white/5 shrink-0" 
-                          title="Sıfırla"
-                        >
-                          <Maximize size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-               </div>
-             ) : (
-               <div className="text-center p-20 flex flex-col items-center">
-                  <div className="w-32 h-32 bg-white/5 rounded-[48px] flex items-center justify-center mb-10 text-gray-700 border border-white/5 shadow-inner"><ImageIcon size={48} /></div>
-                  <h3 className="text-4xl font-black mb-4 tracking-tighter uppercase tracking-widest">Medya Bekleniyor</h3>
-                  <button onClick={triggerFileInput} className="bg-white text-black px-14 py-5 rounded-[24px] font-black shadow-2xl hover:bg-gray-200 transition-all active:scale-95 uppercase tracking-widest text-xs">Dosya Seç</button>
-               </div>
-             )}
-             {isProcessing && (
-               <div className="absolute inset-0 z-[100] bg-black/98 backdrop-blur-3xl flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 border-[6px] border-white/5 border-t-white rounded-[40px] animate-spin mb-10 shadow-2xl" />
-                  <div className="space-y-4 text-center">{aiLogs.map((log, i) => (<p key={i} className="text-sm font-black text-gray-400 px-10 uppercase tracking-[0.3em] italic">{log}</p>))}</div>
-               </div>
-             )}
-          </div>
-        </section>
-        <aside className="w-[100px] border-l border-white/5 bg-[#0a0a0a] flex flex-col shadow-2xl z-20 overflow-y-auto custom-scrollbar p-4 space-y-6">
+        {/* SAĞ PANEL (GEÇMİŞ) - MOBİLDE EN ALTA ŞERİT OLARAK */}
+        <aside className="w-full lg:w-[100px] h-auto lg:h-full border-t lg:border-t-0 lg:border-l border-white/5 bg-[#0a0a0a] flex flex-row lg:flex-col shadow-2xl z-20 overflow-x-auto lg:overflow-y-auto custom-scrollbar p-4 space-x-4 lg:space-x-0 lg:space-y-6 order-3 items-center lg:items-center">
+            {fileList.length === 0 && <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest whitespace-nowrap lg:whitespace-normal text-center w-full">GEÇMİŞ BOŞ</div>}
             {fileList.map((file, idx) => (
-              <div key={file.id} onClick={() => { if (uploadedFile === file.url) return; setIsProcessing(false); setUploadedFile(file.url); setFileType(file.type); setSplitCount(4); setSplitSlides([]); setPage('loading'); setTimeout(() => setPage('editor'), 600); }} className={`relative group rounded-[20px] overflow-hidden aspect-square border-2 shadow-xl cursor-pointer transition-all shrink-0 ${uploadedFile === file.url ? 'border-white ring-2 ring-white/20' : 'border-white/10 opacity-60 hover:opacity-100'}`}>
+              <div key={file.id} onClick={() => { if (uploadedFile === file.url) return; setIsProcessing(false); setUploadedFile(file.url); setFileType(file.type); setSplitCount(4); setSplitSlides([]); setPage('loading'); setTimeout(() => setPage('editor'), 600); }} className={`relative group rounded-[16px] lg:rounded-[20px] overflow-hidden aspect-square h-16 lg:h-auto lg:w-full border-2 shadow-xl cursor-pointer transition-all shrink-0 ${uploadedFile === file.url ? 'border-white ring-2 ring-white/20' : 'border-white/10 opacity-60 hover:opacity-100'}`}>
                   {file.type === 'video' ? <video src={file.url} className="w-full h-full object-cover" /> : <img src={file.url} className="w-full h-full object-cover" alt="Thumb" />}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><button onClick={(e) => { e.stopPropagation(); const newList = fileList.filter((_, i) => i !== idx); setFileList(newList); if (uploadedFile === file.url) { if (newList.length > 0) { setUploadedFile(newList[0].url); setFileType(newList[0].type); setIsProcessing(false); setSplitSlides([]); setSplitCount(4); setPage('loading'); setTimeout(() => setPage('editor'), 600); } else { setUploadedFile(null); setPage('landing'); } } }} className="p-2 bg-red-500/80 hover:bg-red-500 rounded-lg text-white scale-75 group-hover:scale-100 transition-all"><X size={14} /></button></div>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><button onClick={(e) => { e.stopPropagation(); const newList = fileList.filter((_, i) => i !== idx); setFileList(newList); if (uploadedFile === file.url) { if (newList.length > 0) { setUploadedFile(newList[0].url); setFileType(newList[0].type); setIsProcessing(false); setSplitSlides([]); setSplitCount(4); setPage('loading'); setTimeout(() => setPage('editor'), 600); } else { setUploadedFile(null); setPage('landing'); } } }} className="p-1.5 lg:p-2 bg-red-500/80 hover:bg-red-500 rounded-lg text-white scale-90 lg:scale-75 group-hover:scale-100 transition-all"><X size={14} /></button></div>
               </div>
             ))}
-            <div className="flex flex-col items-center gap-3 shrink-0">{fileList.length > 0 && (<span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{fileList.length}/10</span>)}{fileList.length < 10 && (<div onClick={triggerFileInput} className="w-full aspect-square border-2 border-dashed border-white/10 rounded-[20px] flex items-center justify-center text-gray-800 hover:text-white transition-all cursor-pointer shadow-inner"><Plus size={20} /></div>)}</div>
+            <div className="flex lg:flex-col items-center gap-3 shrink-0">
+              {fileList.length > 0 && (<span className="text-[9px] lg:text-[10px] font-black text-gray-500 uppercase tracking-widest">{fileList.length}/10</span>)}
+              {fileList.length < 10 && (<div onClick={triggerFileInput} className="h-16 w-16 lg:h-auto lg:w-full lg:aspect-square border-2 border-dashed border-white/10 rounded-[16px] lg:rounded-[20px] flex items-center justify-center text-gray-800 hover:text-white transition-all cursor-pointer shadow-inner"><Plus size={20} /></div>)}
+            </div>
         </aside>
       </main>
       {notification && (<div className="fixed bottom-36 left-1/2 -translate-x-1/2 bg-white text-black px-12 py-5 rounded-[30px] font-black shadow-[0_30px_100px_rgba(0,0,0,0.5)] z-[200] flex items-center gap-4 animate-in slide-in-from-bottom-5 fade-in duration-300"><CheckCircle2 size={20} className="text-green-500 shadow-xl" /><span className="uppercase tracking-widest text-[10px] font-black">{notification}</span></div>)}
