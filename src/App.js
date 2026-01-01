@@ -6,7 +6,7 @@ import {
   Zap, CheckCircle2,
   Grid, DownloadCloud, FileImage, 
   ShieldCheck, Cpu, Activity, Target, Lock, ServerOff, HelpCircle as HelpIcon, Info, MessageCircleQuestion, FileQuestion, ZoomIn, Maximize,
-  Download, Eye, Shield, Github, Settings
+  Download, Eye, Shield, Github, Settings, ChevronRight // ChevronRight eklendi
 } from 'lucide-react';
 
 // --- ICONS (Custom) ---
@@ -439,7 +439,25 @@ const App = () => {
           <div className="bg-white/[0.03] p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors"><h3 className="text-white font-bold mb-3 flex items-center gap-3"><Eye size={18} className="text-purple-400"/><span className="uppercase tracking-tight text-xs">AI Modeli Eğitilmez</span></h3><p className="text-gray-400 leading-relaxed text-xs">Kullanılan algoritmalar yereldir. Görselleriniz, herhangi bir yapay zeka modelini eğitmek veya yüz taraması yapmak amacıyla <strong>kullanılmaz.</strong></p></div>
           <div className="bg-white/[0.03] p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors"><h3 className="text-white font-bold mb-3 flex items-center gap-3"><Shield size={18} className="text-yellow-400"/><span className="uppercase tracking-tight text-xs">Sıfır İz Politikası</span></h3><p className="text-gray-400 leading-relaxed text-xs">Kişisel verileriniz, IP adresiniz veya kullanım alışkanlıklarınız hiçbir üçüncü taraf ile paylaşılmaz. Uygulama tamamen anonimdir.</p></div>
         </div>
-        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col items-center gap-4"><p className="text-[10px] text-gray-600 uppercase tracking-widest">Bu uygulama KVKK ve GDPR gizlilik standartlarına uygun olarak tasarlanmıştır.</p><button onClick={handlePrivacyAccept} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-all uppercase tracking-widest text-xs shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)]">Güvenlik Protokollerini Onayla ve Devam Et</button></div>
+        
+        {/* ADDED: OPEN SOURCE MENTION - Clickable Button Style */}
+        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col items-center gap-4 text-center">
+            <a href="https://github.com/irmaakq/Dump-Splitter" target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-5 py-3 rounded-2xl border border-white/10 transition-all group w-full md:w-auto justify-center">
+                <Github size={20} className="text-white group-hover:scale-110 transition-transform" />
+                <div className="flex flex-col items-start">
+                    <span className="text-xs text-white font-bold uppercase tracking-wide">Kaynak Kodları İncele</span>
+                    <span className="text-[10px] text-gray-500 font-medium">GitHub üzerinden erişilebilir</span>
+                </div>
+                <ChevronRight size={16} className="text-gray-600 ml-2 group-hover:text-white transition-colors" />
+            </a>
+            
+            <p className="text-[10px] text-gray-600 uppercase tracking-widest max-w-md">
+                Şeffaflık politikamız gereği bu projenin tüm kodları açık kaynaklıdır. 
+                <br className="hidden md:block"/>KVKK ve GDPR standartlarına uygun olarak tasarlanmıştır.
+            </p>
+            
+            <button onClick={handlePrivacyAccept} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-all uppercase tracking-widest text-xs shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)]">Güvenlik Protokollerini Onayla ve Devam Et</button>
+        </div>
       </div>
     </div>
   );
@@ -538,10 +556,10 @@ const App = () => {
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={handleFileSelect} />
         <Header isEditor={false} />
         <div className="absolute top-8 right-4 md:right-8 z-[80] flex flex-wrap justify-end gap-2 md:gap-3">
-             <button onClick={() => setShowAbout(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><Info size={12} /> <span className="hidden md:inline">DUMP SPLITTER NEDİR?</span><span className="md:hidden">NEDİR?</span></button>
-             <button onClick={() => setShowHowTo(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><HelpIcon size={12} /> <span className="hidden md:inline">Nasıl Kullanılır?</span><span className="md:hidden">NASIL?</span></button>
+             <button onClick={() => setShowAbout(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><Info size={12} /> DUMP SPLITTER NEDİR?</button>
+             <button onClick={() => setShowHowTo(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><HelpIcon size={12} /> Nasıl Kullanılır?</button>
              <button onClick={() => setShowFAQ(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><MessageCircleQuestion size={12} /> SSS</button>
-            <button onClick={() => setShowPrivacy(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><ShieldCheck size={12} /> <span className="hidden md:inline">Gizlilik</span></button>
+            <button onClick={() => setShowPrivacy(true)} className="flex items-center gap-2 text-[8px] md:text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest border border-white/10 px-3 py-2 md:px-4 md:py-2 rounded-full hover:bg-white/5 bg-black/20 backdrop-blur-sm"><ShieldCheck size={12} /> Gizlilik</button>
         </div>
         <div className="absolute top-0 -z-10 w-full h-full bg-gradient-to-b from-blue-900/10 via-transparent to-transparent" />
         <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-4 md:mb-8 leading-normal pt-32 md:pt-48 pb-4 md:pb-6 italic uppercase">DUMP <br /> SPLITTER</h1>
